@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>HARNESS — live demo</title>
+    <meta name="description" content="HARNESS running in your browser: chat, files, tools, plugins and agent runs against an in-tab kernel with a mock model." />
+    <script>
+      (function () {
+        var JS = "assets/demo-DasEPBld.js";
+        var CSS = "assets/demo-BYEE1Gos.css";
+        var segs = location.pathname.split("/").filter(Boolean);
+        var home = segs.length ? "/" + segs[0] + "/" : "/";
+        var candidates = segs.length ? ["/" + segs[0] + "/", "/"] : ["/"];
+        function boot(root) {
+          var base = document.createElement("base");
+          base.href = root;
+          document.head.appendChild(base);
+          if (CSS) {
+            var link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.href = root + CSS;
+            document.head.appendChild(link);
+          }
+          var tag = document.createElement("script");
+          tag.type = "module";
+          tag.src = root + JS;
+          document.head.appendChild(tag);
+        }
+        function fail() {
+          var root = document.getElementById("root");
+          if (!root) return;
+          root.style.cssText = "padding:3rem 1.5rem;font:16px/1.5 system-ui,sans-serif;max-width:34rem";
+          root.innerHTML = '<h1 style="font-size:1.25rem;margin:0 0 .75rem">This address is not part of the demo.</h1>' +
+            '<p style="margin:0 0 1rem">The app itself is fine \u2014 the page you asked for was not found where it was served from.</p>' +
+            '<p style="margin:0"><a style="color:inherit" href="' + home + '">Open the demo home</a></p>'; 
+        }
+        function next(i) {
+          if (i >= candidates.length) return fail();
+          var root = candidates[i];
+          fetch(root + JS, { method: "HEAD" })
+            .then(function (res) { if (res && res.ok) boot(root); else next(i + 1); })
+            .catch(function () { next(i + 1); });
+        }
+        next(0);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>window.__HARNESS_DEMO__ = true;</script>
+    <noscript>HARNESS needs JavaScript. The server build serves the same app over HTTP.</noscript>
+  </body>
+</html>
